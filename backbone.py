@@ -31,13 +31,21 @@ class Mngmnt:
 	def __init__(self,password):
 		self.secret = hashlib.md5(password.encode('utf-8')).hexdigest()
 		self.cipher = AES.new(self.secret)
-	def encrypt(data):
+		#Encryption Setup
+		self.BLOCK_SIZE = 32
+		self.PADDING = '{'
+		self.pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
+		self.EncodeAES = lambda c , s: base64.b64encode(c.encrypt(pad(s)))
+		self.DecodeAES = lambda c , e: c.decrypt(base64.b64decode(e)).decode('utf-8').rstrip(PADDING)
+		self.PASSWORD_LENGHT = 50
+		self.CHARS = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','?','*','&','"','+','-']
+		self.data = []
+	def encrypt(self.data):
 		encoded = EncodeAES(cipher,data)
 		return encoded
-	def decrypt(data):
+	def decrypt(self.data):
 		decrypt = DecodeAES(cipher,data)
 		return decoded
-	
 	def loadPwFile():
 		if os.stat("pws.encr").st_size == 0:
 			return 0
@@ -51,11 +59,11 @@ class Mngmnt:
 				x = i.split("#")
 				x[2] = x[2].replace("\n","")
 				dm = DataModule(x[0],x[1],x[2])
-				data.append(dm)
+				self.data.append(dm)
 	def savePwFile():
 		s = open("pws.encr","wt")
 		b = ""
-		for i in data:
+		for i in self.data:
 			b += str(i.name+"#"+i.password+"#"+i.website)
 			b += "$"
 		b = encrypt(b).decode('utf-8')
@@ -77,16 +85,8 @@ class Mngmnt:
 			pw += str(CHARS[ps[c]])
 		return pw
 	def addNewEntryG(name,website):#Generate a new random Password for this website
-		data.append(DataModule(name,genPassword(),website))
+		self.data.append(DataModule(name,genPassword(),website))
 	def addNewEntryM(name,password,website):#Use the user's password
-		data.append(DataModule(name,password,website))		
-#Encryption Setup
-BLOCK_SIZE = 32
-PADDING = '{'
-pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
-EncodeAES = lambda c , s: base64.b64encode(c.encrypt(pad(s)))
-DecodeAES = lambda c , e: c.decrypt(base64.b64decode(e)).decode('utf-8').rstrip(PADDING)
-PASSWORD_LENGHT = 50#Safer Config random.randint(50,53) -> more password-lenghts to bruteforce | not needed
-CHARS = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','.',',','?','*','&','"','+','-']
-	
+		self.data.append(DataModule(name,password,website))
+
 	
