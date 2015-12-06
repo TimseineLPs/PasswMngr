@@ -15,9 +15,26 @@ height = 600
 r = Tk()
 r.withdraw()
 
+_password = ""
+_Action_Backbone = ""#used by the frontend to tell the backend to do something
+_Msg = ""#message containing additional information about the action
+_DataTrans = 0#Variable for transport of larger datasets
+
+Backbone = Mngmnt()
+
 M = Master(width,height)
 
-Hold = Mngmnt()
-Hold.loadPwFile()
+f = open("getpw.desc","rt")#Layout to get user password
+M.build(f.read())
+while _password== "":#user has not entered password
+	M.main()
+f.close()
+#Graphics framework updates _password and notifies backend(calling Mngmnt.start(_password))
 
-Hold.savePwFile()
+f = open("main.desc","rt")#Layout for gerneral use
+M.build(f.read())
+f.close()
+while True:
+	M.main()
+	Backbone.actions()
+

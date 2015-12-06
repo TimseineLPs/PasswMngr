@@ -1,4 +1,4 @@
-import random , os , math , binascii , base64 , getpass , hashlib
+import random , os , binascii , base64 , hashlib
 from tkinter import Tk
 from Crypto.Cipher import AES
 
@@ -28,8 +28,7 @@ class DataModule:
 		self.password = password
 		self.name = name
 class Mngmnt:
-	def __init__(self,password):
-		self.secret = hashlib.md5(password.encode('utf-8')).hexdigest()
+	def start(self,password):
 		self.cipher = AES.new(self.secret)
 		#Encryption Setup
 		self.BLOCK_SIZE = 32
@@ -40,13 +39,15 @@ class Mngmnt:
 		self.PASSWORD_LENGHT = 50
 		self.CHARS = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','?','*','&','"','+','-']
 		self.data = []
-	def encrypt(self.data):
+		del _password
+		self.loadPwFile()
+	def encrypt(data):
 		encoded = EncodeAES(cipher,data)
 		return encoded
-	def decrypt(self.data):
+	def decrypt(data):
 		decrypt = DecodeAES(cipher,data)
 		return decoded
-	def loadPwFile():
+	def loadPwFile(self):
 		if os.stat("pws.encr").st_size == 0:
 			return 0
 		else:
@@ -60,7 +61,7 @@ class Mngmnt:
 				x[2] = x[2].replace("\n","")
 				dm = DataModule(x[0],x[1],x[2])
 				self.data.append(dm)
-	def savePwFile():
+	def savePwFile(self):
 		s = open("pws.encr","wt")
 		b = ""
 		for i in self.data:
@@ -68,25 +69,46 @@ class Mngmnt:
 			b += "$"
 		b = encrypt(b).decode('utf-8')
 		s.write(b)
-	def genPassword():
+	def genPassword(self):
 		x = int(binascii.hexlify(os.urandom(8)).decode('utf-8'),16)
-		y = int(binascii.hexlify(os.urandom(5)).decode('utf-8'),16)
 		c = int(binascii.hexlify(os.urandom(2)).decode('utf-8'),16)
 		ps = []
 		pw = ""
 		i = 0
-		while x > len(CHARS):
+		while x > len(self.CHARS):
 			i += 1
-			ps.append(x % len(CHARS))
-			x -= y
+			ps.append(x % len(self.CHARS))
+			x -= random.randint(1000,999999)
 			if i > 100000:
 				break
-		for i in range(PASSWORD_LENGHT):
-			pw += str(CHARS[ps[c]])
+		for i in range(self.PASSWORD_LENGHT):
+			pw += str(self.CHARS[ps[c+random.randint(1,1000)]])
 		return pw
-	def addNewEntryG(name,website):#Generate a new random Password for this website
+	def addNewEntryG(self,name,website):#Generate a new random Password for this website
 		self.data.append(DataModule(name,genPassword(),website))
-	def addNewEntryM(name,password,website):#Use the user's password
+	def addNewEntryM(self,name,password,website):#Use the user's password
 		self.data.append(DataModule(name,password,website))
+	def actions(self):
+		global _Action_Backbone ,_password,_Msg
+		
+		for case in switch(_Action):
+			if case(""):
+				pass
+			elif case("start"):
+				self.start(_password)
+				_password = ""
+			elif case("exit"):
+				self.savePwFile()
+				exit()
+			elif case("add new"):
+				j = _Msg.split("~")
+				self.addNewEntryG(j[0],j[1])
+			elif case("add manual"):
+				j = _Msg.split("~")
+				self.addNewEntryM(j[0],j[1],j[2])
+			elif case("rm") or case("remove") or case("del"):
+				del self.data[int(_Msg)]
+		_Msg = ""
+		_Action_Backbone = ""
 
 	

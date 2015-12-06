@@ -3,7 +3,7 @@ This is a password generation and encryption tool.
 This Software is provided as is without any warranty. In no case should the Author be liable for the Software.
 Tim Hartmann , November 2015
 """
-import random , os , binascii , base64 , getpass
+import random , os , binascii , base64 , getpass , hashlib
 from tkinter import Tk
 from Crypto.Cipher import AES
 
@@ -94,8 +94,7 @@ def addNewEntryM(name,password,website):#Use the users Password
 	data.append(DataModule(name,password,website))
 
 GlobPasswd = getpass.getpass("Enter your Master-Password(16 character minimum recomended):")
-while len(GlobPasswd) < 32:
-	GlobPasswd += GlobPasswd
+GlobPasswd = hashlib.sha256(GlobPasswd.encode('utf-8')).hexdigest()
 #Encryption Setup
 BLOCK_SIZE = 32
 PADDING = '{'
@@ -103,7 +102,7 @@ pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
 EncodeAES = lambda c , s: base64.b64encode(c.encrypt(pad(s)))
 DecodeAES = lambda c , e: c.decrypt(base64.b64decode(e)).decode('utf-8').rstrip(PADDING)
 
-secret = GlobPasswd.encode('utf-8')[0:32]
+secret = GlobPasswd.encode[0:32]
 cipher = AES.new(secret)
 
 #Password-Generation Setup
